@@ -56,7 +56,7 @@ def get_github_issues(github_api_url):
         response = requests.get(paginated_url, headers=headers)
 
         if response.status_code != 200:
-            print(f"Ошибка при получении issues с GitHub: {response.status_code}")
+            print(f"Ошибка при получении проблем с GitHub: {response.status_code}")
             print(response.text)  # Выводим подробности ошибки
             break
 
@@ -68,7 +68,7 @@ def get_github_issues(github_api_url):
         page += 1  # Переход к следующей странице
 
     total_issues = (len(issues))
-    print(f"Извлечено {total_issues} задач.")
+    print(f"Извлечено {total_issues} проблем(ы).")
     
     return issues, total_issues
 
@@ -98,7 +98,7 @@ def create_gitflic_issue(gitflic_api_url, title, description, status, assigned_u
         if response.status_code == 200:
             print(f"Issue '{title}' успешно создана в GitFlic.")
             if total_issues > 500:
-                print(f"Задач слишком много, ждем несколько секунд после создания задачи...")
+                print(f"Проблем слишком много, будем ждать несколько секунд после создания каждой проблемы...")
                 time.sleep(delay)
             return  # Успешно создали, выходим из функции
         
@@ -123,6 +123,11 @@ def import_issues_from_github_to_gitflic(github_api_url, gitflic_api_url):
     github_issues, total_issues = get_github_issues(github_api_url)
 
     for issue in github_issues:
+        # Проверяем, является ли запись пул-реквестом
+        if 'pull_request' in issue:
+            print(f"Пропускаем pull request: {issue['title']}")
+            continue
+
         title = issue['title']
         description = issue['body']
 
@@ -152,7 +157,7 @@ def process_repos_file(filename):
         # Формируем API URL для GitHub и GitFlic
         github_api_url = f"https://api.github.com/repos/{github_repo}/issues?state=all&direction=asc"
         gitflic_api_url = f"https://api.gitflic.ru/project/{gitflic_repo}/issue"
-        
+
         print(f"Извлечение проблем из {github_repo}...")
         import_issues_from_github_to_gitflic(github_api_url, gitflic_api_url)
 
