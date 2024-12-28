@@ -1,0 +1,2 @@
+github_owner_alias/myrepo;gitflic_owner_alias/myrepo
+github_owner_alias/myrepo2;gitflic_owner_alias/myrepo2
